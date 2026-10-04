@@ -1,0 +1,21 @@
+{
+  "name": "offline-first-sync",
+  "version": "0.1.0",
+  "description": "A generic SQLite sync engine demonstrating offline-first architecture with Drizzle ORM.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "drizzle-orm": "^0.30.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.9",
+    "drizzle-kit": "^0.20.14",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  },
+  "license": "MIT"
+}
