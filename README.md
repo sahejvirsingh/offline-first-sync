@@ -1,40 +1,43 @@
-# Offline-First Sync Engine
+﻿# 🔄 Offline-First Sync Engine
 
-A generic sync engine demonstrating offline-first architecture using local SQLite and Drizzle ORM.
+A standalone reference implementation of a Local-First synchronization queue using SQLite and Drizzle ORM.
 
-## Features
+## ✨ Features
 
-- **Mutation Queue:** All local creates, updates, and deletes are instantly recorded in a `sync_mutations` queue.
-- **Push Phase:** Batches pending mutations and sends them to the remote API. Upon success, clears the queue and marks items as `synced`.
-- **Pull Phase:** Fetches remote changes since the last sync timestamp.
-- **Conflict Resolution:** Implements a strict Last-Write-Wins (LWW) strategy based on `updated_at` timestamps to safely merge remote changes over local states.
+- **Local-First Writes**: Immediate, synchronous writes to a local database (etter-sqlite3).
+- **Mutation Queue**: Automatically records all mutations (create, update, delete) to a sync_mutations table when offline.
+- **Batched Syncing**: Drains the local queue, pushes to a remote API, and pulls new changes.
+- **Conflict Resolution**: Implements a strict Last-Write-Wins (LWW) merge strategy based on updated_at timestamps to safely override local data with remote truth.
+- **Drizzle ORM**: Fully type-safe local database queries.
 
-## Tech Stack
+## 🚀 Quick Start
 
-- **Drizzle ORM** for schema definition and type-safe querying.
-- **Better-SQLite3** for fast, synchronous local data operations.
-- **Vitest** for testing the conflict resolution algorithm.
-
-## Testing
-
-```bash
+`ash
 npm install
 npm test
-```
+`
 
-## Architecture
+## 🧠 Architecture
 
-```mermaid
-flowchart TD
-    App[UI / App] -->|Reads/Writes| LocalDB[(Local SQLite)]
-    App -->|Write Action| Engine[Sync Engine]
+`mermaid
+sequenceDiagram
+    participant UI as Application
+    participant Local as Local SQLite
+    participant Queue as Mutation Queue
+    participant Remote as Remote API
+
+    UI->>Local: Update record
+    Local->>Queue: Log mutation (action, payload)
     
-    Engine -->|1. Queue Mutation| LocalDB
-    Engine -->|2. Push Phase| RemoteAPI[Remote Server]
-    RemoteAPI -->|3. Pull Changes| Engine
-    Engine -->|4. Resolve LWW| LocalDB
-```
+    Note over Queue, Remote: --- Push Phase ---
+    Queue->>Remote: Send pending mutations
+    Remote-->>Queue: Acknowledge processed IDs
+    Queue->>Queue: Clear processed IDs
+    
+    Note over Queue, Remote: --- Pull Phase ---
+    Remote-->>Local: Send recent changes
+    Local->>Local: Merge using Last-Write-Wins
+`
 
-## License
+## 📄 License
 MIT
-
